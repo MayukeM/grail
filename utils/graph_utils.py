@@ -60,31 +60,31 @@ def ssp_to_torch(A, device, dense=False):
 
 def ssp_multigraph_to_dgl(graph, n_feats=None):
     """
-    Converting ssp multigraph (i.e. list of adjs) to dgl multigraph.
+    Converting ssp multigraph (i.e. list of adjs) to dgl multigraph. 转换为dgl多图
     """
 
     g_nx = nx.MultiDiGraph()
     g_nx.add_nodes_from(list(range(graph[0].shape[0])))
-    # Add edges
+    # Add edges，添加边
     for rel, adj in enumerate(graph):
-        # Convert adjacency matrix to tuples for nx0
+        # Convert adjacency matrix to tuples for nx0，将邻接矩阵转换为nx的元组
         nx_triplets = []
         for src, dst in list(zip(adj.tocoo().row, adj.tocoo().col)):
             nx_triplets.append((src, dst, {'type': rel}))
         g_nx.add_edges_from(nx_triplets)
 
-    # make dgl graph
+    # make dgl graph，创建dgl图
     g_dgl = dgl.DGLGraph(multigraph=True)
     g_dgl.from_networkx(g_nx, edge_attrs=['type'])
-    # add node features
+    # add node features，添加节点特征
     if n_feats is not None:
         g_dgl.ndata['feat'] = torch.tensor(n_feats)
 
     return g_dgl
 
 
-def collate_dgl(samples):
-    # The input `samples` is a list of pairs
+def collate_dgl(samples):  # collate函数，用于将一个batch的数据整合成一个batch
+    # The input `samples` is a list of pairs，输入的样本是一个对的列表
     graphs_pos, g_labels_pos, r_labels_pos, graphs_negs, g_labels_negs, r_labels_negs = map(list, zip(*samples))
     batched_graph_pos = dgl.batch(graphs_pos)
 

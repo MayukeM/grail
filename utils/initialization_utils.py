@@ -40,19 +40,19 @@ def initialize_experiment(params, file_name):
 def initialize_model(params, model, load_model=False):
     '''
     relation2id: the relation to id mapping, this is stored in the model and used when testing
-    model: the type of model to initialize/load
-    load_model: flag which decide to initialize the model or load a saved model
+    model: the type of model to initialize/load  模型：初始化/加载的模型类型
+    load_model: flag which decide to initialize the model or load a saved model  加载模型的标志，决定初始化模型还是加载保存的模型
     '''
 
     if load_model and os.path.exists(os.path.join(params.exp_dir, 'best_graph_classifier.pth')):
         logging.info('Loading existing model from %s' % os.path.join(params.exp_dir, 'best_graph_classifier.pth'))
         graph_classifier = torch.load(os.path.join(params.exp_dir, 'best_graph_classifier.pth')).to(device=params.device)
     else:
-        relation2id_path = os.path.join(params.main_dir, f'data/{params.dataset}/relation2id.json')
-        with open(relation2id_path) as f:
+        relation2id_path = os.path.join(params.main_dir, f'data/{params.dataset}/relation2id.json')  # 读取relation2id.json文件
+        with open(relation2id_path) as f:  # 读取relation2id.json文件
             relation2id = json.load(f)
 
-        logging.info('No existing model found. Initializing new model..')
-        graph_classifier = model(params, relation2id).to(device=params.device)
+        logging.info('No existing model found. Initializing new model..')  # 没有找到现有模型。初始化新模型。
+        graph_classifier = model(params, relation2id).to(device=params.device)  # 实例化模型
 
     return graph_classifier

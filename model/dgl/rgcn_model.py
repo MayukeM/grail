@@ -35,22 +35,22 @@ class RGCN(nn.Module):
         else:
             self.attn_rel_emb = None
 
-        # initialize aggregators for input and hidden layers
-        if params.gnn_agg_type == "sum":
+        # initialize aggregators for input and hidden layers 初始化输入和隐藏层的聚合器
+        if params.gnn_agg_type == "sum":  # 求和
             self.aggregator = SumAggregator(self.emb_dim)
-        elif params.gnn_agg_type == "mlp":
+        elif params.gnn_agg_type == "mlp":  # 多层感知机
             self.aggregator = MLPAggregator(self.emb_dim)
-        elif params.gnn_agg_type == "gru":
+        elif params.gnn_agg_type == "gru":  # 门控循环单元
             self.aggregator = GRUAggregator(self.emb_dim)
 
         # initialize basis weights for input and hidden layers
         # self.input_basis_weights = nn.Parameter(torch.Tensor(self.num_bases, self.inp_dim, self.emb_dim))
         # self.basis_weights = nn.Parameter(torch.Tensor(self.num_bases, self.emb_dim, self.emb_dim))
 
-        # create rgcn layers
+        # create rgcn layers 创建rgcn层
         self.build_model()
 
-        # create initial features
+        # create initial features  创建初始特征
         self.features = self.create_features()
 
     def create_features(self):
@@ -58,9 +58,9 @@ class RGCN(nn.Module):
         return features
 
     def build_model(self):
-        self.layers = nn.ModuleList()
+        self.layers = nn.ModuleList()  # 用于存储网络层的列表
         # i2h
-        i2h = self.build_input_layer()
+        i2h = self.build_input_layer()  # 构建输入层
         if i2h is not None:
             self.layers.append(i2h)
         # h2h

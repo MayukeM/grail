@@ -8,17 +8,17 @@ Source: https://github.com/dmlc/dgl/tree/master/examples/pytorch/rgcn
 """
 
 
-class GraphClassifier(nn.Module):
+class GraphClassifier(nn.Module):  # 图分类器
     def __init__(self, params, relation2id):  # in_dim, h_dim, rel_emb_dim, out_dim, num_rels, num_bases):
         super().__init__()
 
         self.params = params
         self.relation2id = relation2id
 
-        self.gnn = RGCN(params)  # in_dim, h_dim, h_dim, num_rels, num_bases)
-        self.rel_emb = nn.Embedding(self.params.num_rels, self.params.rel_emb_dim, sparse=False)
+        self.gnn = RGCN(params)  # in_dim, h_dim, h_dim, num_rels, num_bases)  # RGCN模型
+        self.rel_emb = nn.Embedding(self.params.num_rels, self.params.rel_emb_dim, sparse=False)  # 关系嵌入
 
-        if self.params.add_ht_emb:
+        if self.params.add_ht_emb:  # 如果添加头尾实体嵌入
             self.fc_layer = nn.Linear(3 * self.params.num_gcn_layers * self.params.emb_dim + self.params.rel_emb_dim, 1)
         else:
             self.fc_layer = nn.Linear(self.params.num_gcn_layers * self.params.emb_dim + self.params.rel_emb_dim, 1)

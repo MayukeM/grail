@@ -29,12 +29,12 @@ class Trainer():
 
         if params.optimizer == "SGD":
             self.optimizer = optim.SGD(model_params, lr=params.lr, momentum=params.momentum, weight_decay=self.params.l2)
-        if params.optimizer == "Adam":
+        if params.optimizer == "Adam":  # 优化器Adam
             self.optimizer = optim.Adam(model_params, lr=params.lr, weight_decay=self.params.l2)
 
-        self.criterion = nn.MarginRankingLoss(self.params.margin, reduction='sum')
+        self.criterion = nn.MarginRankingLoss(self.params.margin, reduction='sum')  # 损失函数, 用于计算两个向量之间的余弦距离
 
-        self.reset_training_state()
+        self.reset_training_state()  # 重置训练状态, 用于记录最好的模型
 
     def reset_training_state(self):
         self.best_metric = 0
@@ -54,21 +54,21 @@ class Trainer():
             data_pos, targets_pos, data_neg, targets_neg = self.params.move_batch_to_device(batch, self.params.device)
             self.optimizer.zero_grad()
             score_pos = self.graph_classifier(data_pos)
-            score_neg = self.graph_classifier(data_neg)
+            score_neg = self.graph_classifier(data_neg)  # 用于计算两个向量之间的余弦距离
             loss = self.criterion(score_pos, score_neg.view(len(score_pos), -1).mean(dim=1), torch.Tensor([1]).to(device=self.params.device))
             # print(score_pos, score_neg, loss)
-            loss.backward()
-            self.optimizer.step()
-            self.updates_counter += 1
+            loss.backward()  # 反向传播
+            self.optimizer.step()  # 更新参数
+            self.updates_counter += 1  # 更新次数
 
-            with torch.no_grad():
+            with torch.no_grad():  # 不计算梯度,目的是节省内存
                 all_scores += score_pos.squeeze().detach().cpu().tolist() + score_neg.squeeze().detach().cpu().tolist()
                 all_labels += targets_pos.tolist() + targets_neg.tolist()
-                total_loss += loss
+                total_loss += loss  # 计算总的损失
 
             if self.valid_evaluator and self.params.eval_every_iter and self.updates_counter % self.params.eval_every_iter == 0:
-                tic = time.time()
-                result = self.valid_evaluator.eval()
+                tic = time.time()  # 计算时间，用于评估
+                result = self.valid_evaluator.eval()  # 评估
                 logging.info('\nPerformance:' + str(result) + 'in ' + str(time.time() - tic))
 
                 if result['auc'] >= self.best_metric:
@@ -91,7 +91,7 @@ class Trainer():
         return total_loss, auc, auc_pr, weight_norm
 
     def train(self):
-        self.reset_training_state()
+        self.reset_training_state()  # 重置训练状态, 用于记录最好的模型
 
         for epoch in range(1, self.params.num_epochs + 1):
             time_start = time.time()
